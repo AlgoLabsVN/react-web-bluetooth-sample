@@ -5,16 +5,41 @@ export interface Weight {
   disconnect: () => void;
   isConnected: boolean;
   weight: string;
+  stableWeight: string;
+  textColor: string;
 }
+
 
 export const useWeightIND236 = (): Weight => {
   const [isConnected, setIsConnected] = React.useState(false);
   const [weight, setWeight] = React.useState("0");
+  const [stableWeight, setStableWeight] = React.useState("0");
+  const [textColor, setTextColor] = React.useState('black');
+  let preTime = Date.now();
+  let preWeight = "0";
+  let duration = 0;
 
   const handleCharacteristicValueChanged = (event: any) => {
+
     const decoder = new TextDecoder();
     const str = decoder.decode(event.target.value);
+ 
+    if(str === preWeight){
+      duration = Date.now() - preTime;
+      console.log(duration)
+    }else{
+      preTime = Date.now();
+      preWeight = str;
+      duration = 0;
+    }
+    if(duration >= 2000 && +str > 50){
+      setTextColor("green");
+      setStableWeight(str);
+    }else{
+      setTextColor("black");
+    }
     setWeight(str);
+
   };
 
   const [trueDevice, setDevice] = React.useState<BluetoothDevice>();
@@ -91,6 +116,8 @@ export const useWeightIND236 = (): Weight => {
     connect,
     isConnected,
     weight,
+    stableWeight,
     disconnect,
+    textColor
   };
 };
